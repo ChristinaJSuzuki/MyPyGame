@@ -18,7 +18,7 @@ Config = {
     "ScreenTitle": "Christina's Snake Game",
     "background": Colors["MintyGreen"],
     "BlockSize": 10,
-    "Speed": 20,
+    "Speed": 15,
 }
 
 Snake = {
@@ -38,24 +38,31 @@ def RandomizeFoodlocation():
        Food["X"] = round(random.randrange(0,Config["ScreenX"] - Config["BlockSize"]), -1)
        Food["Y"] = round(random.randrange(0,Config["ScreenY"] - Config["BlockSize"]), -1)
 
-screen = pygame.display.set_mode([Config["ScreenX"], Config["ScreenY"]])
-clock = pygame.time.Clock()
-pygame.display.set_caption(Config["ScreenTitle"])
-pygame.display.update()
-RandomizeFoodlocation() 
+def DrawGame(screen):
+    screen.fill(Config["background"])
+    pygame.draw.rect(screen, Snake["Color"], [ Snake["X"], Snake["Y"], Config["BlockSize"], Config["BlockSize"]])
+    pygame.draw.rect(screen, Food["Color"], [Food["X"], Food["Y"], Config["BlockSize"], Config["BlockSize"]])
+    pygame.display.update()
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+def main():
+    screen = pygame.display.set_mode([Config["ScreenX"], Config["ScreenY"]])
+    clock = pygame.time.Clock()
+    pygame.display.set_caption(Config["ScreenTitle"])
+    pygame.display.update()
+    RandomizeFoodlocation() 
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                      Snake["Direction"] = "left"
-            if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                      Snake["Direction"] = "right"        
-            if event.key == pygame.K_UP or event.key == pygame.K_w:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                      Snake["Direction"] = "up"  
-            if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                      Snake["Direction"] = "down"
                         
         if Snake["Direction"] == "left":
@@ -66,17 +73,19 @@ while True:
                Snake["Y"] -= Config["BlockSize"]
         if Snake["Direction"] == "down":
                Snake["Y"] += Config["BlockSize"]
-    
+        
+        DrawGame(screen)
 
-    screen.fill(Config["background"])
-
-    pygame.draw.rect(screen, Snake["Color"], [ Snake["X"], Snake["Y"], Config["BlockSize"], Config["BlockSize"]])
-    pygame.draw.rect(screen, Food["Color"], [Food["X"], Food["Y"], Config["BlockSize"], Config["BlockSize"]])
-    pygame.display.update()
-
-    if Snake["X"] < 0 or Snake["X"] >= Config["ScreenX"] or Snake["Y"] < 0 or Snake["Y"] >= Config["ScreenY"]:
+        if Snake["X"] < 0 or Snake["X"] >= Config["ScreenX"] or Snake["Y"] < 0 or Snake["Y"] >= Config["ScreenY"]:
            break
 
-    clock.tick(Config["Speed"])
+        if Snake["X"] == Food["X"] and Snake["Y"] == Food["Y"]:
+             print("You eat a Delicious Apple")
+             RandomizeFoodlocation()
 
-print("you hit a wall")
+        clock.tick(Config["Speed"])
+
+    print("you hit a wall")
+
+if __name__ == "__main__":
+     main()
