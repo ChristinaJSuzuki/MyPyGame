@@ -1,26 +1,14 @@
 #First Python Game ---- Snake Game
 
 import pygame
+from config import COLORS, CONFIG
+from controls import DIRECTIONS
+from snake import Snake
+from food import Food
 import sys
-import random
-from enum import Enum
+import os.path
 
 pygame.init()
-
-Colors = {
-    "MintyGreen": (40, 210, 180),
-    "Red": (255, 0, 0),
-    "LightBlue": (0, 128, 255),
-    "Black": (0, 0, 0),
-}
-
-class DIRECTIONS(Enum):
-    NONE = 0
-    LEFT = 1
-    RIGHT = 2
-    UP = 3
-    DOWN = 4
-
 class Window():
     def __init__(self, ScreenX = 800, ScreenY = 600):
         self.X = ScreenX
@@ -28,8 +16,8 @@ class Window():
         self.Title = "Christina's Snake Game"
         self.Screen = pygame.display.set_mode([self.X, self.Y]) 
         pygame.display.set_caption(self.Title)
-        self.Background = Colors["Black"]
-        self.FontColor = Colors["LightBlue"]
+        self.Background = COLORS["Black"]
+        self.FontColor = COLORS["LightBlue"]
         self.Menu = [ "Press N for [N]ew Game", "Press Q for [Q]uit" ]
         self.MenuFont = pygame.font.SysFont("microsoftsansserif", 25)
         self.MenuLoop = True
@@ -45,9 +33,9 @@ class Window():
     
     def GetBackground(self):
         if self.GameState:
-            return Colors["MintyGreen"]
+            return COLORS["MintyGreen"]
         else:
-            return Colors["Black"]
+            return COLORS["Black"]
     
     def MainMenu(self):
         self.Screen.fill(self.GetBackground())
@@ -66,7 +54,7 @@ class Window():
         pygame.draw.rect(self.Screen, food.Color, [food.X, food.Y, self.BlockSize, self.BlockSize])
         Overlay = pygame.Surface((self.X, self.Y))
         Overlay.set_alpha(128)
-        Overlay.fill(Colors["Black"])
+        Overlay.fill(COLORS["Black"])
         if self.Pause:
             self.Screen.blit(Overlay, [0, 0])
             msg = self.MenuFont.render("Game Paused - Press P to continue", True, self.FontColor)
@@ -79,33 +67,6 @@ class Window():
     
     def Quit(self):
         sys.exit()
-
-class Snake():
-    def __init__(self, ScreenX, ScreenY):
-        self.X = ScreenX / 2
-        self.Y = ScreenY / 2
-        self.Direction = DIRECTIONS.NONE
-        self.Color = Colors["Red"]
-        self.Length = 0
-        self.Tail = []
-
-    def Move(self, Blocksize):
-    
-        if self.Direction == DIRECTIONS.LEFT:
-            self.X -= Blocksize
-        if self.Direction == DIRECTIONS.RIGHT:
-            self.X += Blocksize
-        if self.Direction == DIRECTIONS.UP:
-            self.Y -= Blocksize
-        if self.Direction == DIRECTIONS.DOWN:
-            self.Y += Blocksize
-            
-
-class Food():
-    def __init__(self, display):
-        self.X = round(random.randrange(0,display.X - display.BlockSize), -1)
-        self.Y = round(random.randrange(0,display.Y - display.BlockSize), -1)
-        self.Color = Colors["LightBlue"]
 
 def main():
     display = Window()
@@ -120,8 +81,8 @@ def main():
                     display.Quit()
                 if event.key == pygame.K_n:
                     display.GameState = True
-                    snake = Snake(display.X, display.Y)
-                    food = Food(display)
+                    snake = Snake()
+                    food = Food()
         
         display.MainMenu()
 
@@ -149,7 +110,7 @@ def main():
                         if snake.Direction != DIRECTIONS.UP:
                             snake.Direction = DIRECTIONS.DOWN
 
-            snake.Move(display.BlockSize)
+            snake.Move()
 
             display.DrawGame(snake, food)
             
@@ -174,7 +135,7 @@ def main():
             if snake.X == food.X and snake.Y == food.Y:
                 snake.Length += 1
                 del food
-                food = Food(display)
+                food = Food()
             
             snake.Tail.append([snake.X, snake.Y])
             if len(snake.Tail) > snake.Length:
