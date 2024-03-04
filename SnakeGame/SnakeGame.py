@@ -24,9 +24,22 @@ class Window():
         self.GameState = False
         self.GameOver = False
         self.Pause = False
+        self.HighScore = 0
+        self.ReadScore()
         self.BlockSize = 10
         self.RefreshRate = 15
         self.Update()
+
+    def ReadScore(self):
+        if os.path.isfile("score.txt"):
+            file = open("score.txt", "r")
+            self.HighScore = int(file.read())
+            file.close()
+    
+    def WriteScore(self):
+        file = open("score.txt", "w")
+        file.write(str(self.HighScore))
+        file.close()
 
     def Update(self):
         pygame.display.update()
@@ -44,6 +57,8 @@ class Window():
             msg = self.MenuFont.render(line, True, self.FontColor)
             self.Screen.blit(msg, [30, ypos])
             ypos += ypos
+        msg = self.MenuFont.render("High Score: " + str(self.HighScore), True, self.FontColor)
+        self.Screen.blit(msg, [30, ypos])
         self.Update()
     
     def DrawGame(self, snake, food):
@@ -52,6 +67,8 @@ class Window():
         for tail in snake.Tail:
             pygame.draw.rect(self.Screen, snake.Color, [ tail[0], tail[1], self.BlockSize, self.BlockSize])    
         pygame.draw.rect(self.Screen, food.Color, [food.X, food.Y, self.BlockSize, self.BlockSize])
+        msg = self.MenuFont.render("Score: " + str(snake.Length), True, COLORS["Purple"])
+        self.Screen.blit(msg, [20, 10])
         Overlay = pygame.Surface((self.X, self.Y))
         Overlay.set_alpha(128)
         Overlay.fill(COLORS["Black"])
@@ -66,6 +83,7 @@ class Window():
         pygame.display.update()
     
     def Quit(self):
+        self.WriteScore()
         sys.exit()
 
 def main():
@@ -142,6 +160,8 @@ def main():
                 del snake.Tail[0]
             
             if not display.GameState:
+                if snake.Length > display.HighScore:
+                    display.HighScore = snake.Length
                 if not display.GameOver:
                     del food
                     del snake

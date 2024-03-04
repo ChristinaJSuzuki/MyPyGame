@@ -3,6 +3,7 @@ COLORS = {
     "Red": (255, 0, 0),
     "LightBlue": (0, 128, 255),
     "Black": (0, 0, 0),
+    "Purple": (109, 0, 204),
 }
 
 CONFIG = {
